@@ -18,11 +18,12 @@ public class MoveController : MonoBehaviour
 
     private MovableObject m_SelectedObject;
     private bool m_MovingObject;
+    private Vector3 m_TargetPosition;
 
     public void Update()
     {
-        var targetPosition = transform.position + m_Camera.transform.forward * m_DistanceTargetMoving;
-        UpdateLine(targetPosition);
+        m_TargetPosition = transform.position + m_Camera.transform.forward * m_DistanceTargetMoving;
+        UpdateLine();
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -44,7 +45,7 @@ public class MoveController : MonoBehaviour
 
         if (m_MovingObject)
         {
-            m_SelectedObject.UpdateTargetPosition(targetPosition, m_MovingForce);
+            m_SelectedObject.UpdateTargetPosition(m_TargetPosition, m_MovingForce);
         }
         else
         {
@@ -63,14 +64,87 @@ public class MoveController : MonoBehaviour
         }
     }
 
-    private void UpdateLine(Vector3 targetPosition)
+    private void UpdateLine()
     {
+        int amount = 20;
         m_LineRenderer.enabled = m_SelectedObject != null && m_MovingObject;
+
+        List<Vector3> positions = new List<Vector3>();
         if (m_SelectedObject && m_MovingObject)
         {
-            m_LineRenderer.SetPosition(0, transform.position);
-            m_LineRenderer.SetPosition(1, targetPosition);
-            m_LineRenderer.SetPosition(2, m_SelectedObject.transform.position);
+            Vector3[] points = new Vector3[]
+            {
+                transform.position
+                    - (m_TargetPosition - transform.position).normalized * 1.3f
+                    - (m_SelectedObject.transform.position - transform.position).normalized * 4.0f,
+                transform.position,
+                Vector3.Lerp(transform.position, m_TargetPosition, .8f + (Mathf.Sin(Time.time * 2.0f) * .3f + .1f)),
+                (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * .5f) * .02f)),
+                m_SelectedObject.transform.position,
+                m_SelectedObject.transform.position
+                    + (m_SelectedObject.transform.position - m_TargetPosition).normalized * 2.0f
+                    + (m_SelectedObject.transform.position - transform.position).normalized * 3.0f,
+            };
+
+            var lastPoint = transform.position;
+            var currentPoint = points[0];
+            var nextPoint = points[1];
+            var nextNextPoint = points[2];
+
+            for (int j = 0; j < points.Length - 2; j++)
+            {
+                currentPoint = points[j];
+                nextPoint = points[(j + 1)];
+                nextNextPoint = points[(j + 2)];
+
+                for (int i = 1; i < amount; i++)
+                {
+                    float t = (float)i / (float)amount;
+                    positions.Add(GetCatmullRomPosition(t, lastPoint, currentPoint, nextPoint, nextNextPoint));
+                }
+
+                lastPoint = currentPoint;
+            }
         }
+
+        m_LineRenderer.positionCount = positions.Count;
+        m_LineRenderer.SetPositions(positions.ToArray());
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (m_SelectedObject && m_MovingObject)
+        {
+            Vector3[] points = new Vector3[]
+            {
+                transform.position
+                    - (m_TargetPosition - transform.position).normalized * 1.3f
+                    - (m_SelectedObject.transform.position - transform.position).normalized * 4.0f,
+                transform.position,
+                Vector3.Lerp(transform.position, m_TargetPosition, .8f + (Mathf.Sin(Time.time * 2.0f) * .3f + .1f)),
+                (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * .5f) * .02f)),
+                m_SelectedObject.transform.position,
+                m_SelectedObject.transform.position
+                    + (m_SelectedObject.transform.position - m_TargetPosition).normalized * 2.0f
+                    + (m_SelectedObject.transform.position - transform.position).normalized * 3.0f,
+            };
+
+            for (int j = 0; j < points.Length; j++)
+            {
+                Gizmos.DrawSphere(points[j], 0.2f);
+            }
+        }
+    }
+
+    private Vector3 GetCatmullRomPosition(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        Vector3 a = 2f * p1;
+        Vector3 b = p2 - p0;
+        Vector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
+        Vector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
+
+        Vector3 pos = 0.5f * (a + (b * t) + (c * t * t) + (d * t * t * t));
+
+        return pos;
     }
 }
