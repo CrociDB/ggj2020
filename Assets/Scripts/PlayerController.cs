@@ -24,9 +24,12 @@ public class PlayerController : MonoBehaviour
     private bool m_CursorIsLocked = false;
     private bool m_LookLock = false;
 
+    public CameraConstantShake CameraShake { get; set; }
+
     private void Start()
     {
         m_Rigid = GetComponent<Rigidbody>();
+        CameraShake = GetComponentInChildren<CameraConstantShake>();
     }
 
     public void Update()
