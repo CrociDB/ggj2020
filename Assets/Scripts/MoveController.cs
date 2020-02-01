@@ -178,7 +178,7 @@ public class MoveController : MonoBehaviour
 
     private void UpdateLine()
     {
-        int amount = 20;
+        int amount = 25;
         m_LineRenderer.enabled = m_SelectedObject != null && m_MovingObject;
 
         List<Vector3> positions = new List<Vector3>();
@@ -187,11 +187,11 @@ public class MoveController : MonoBehaviour
             Vector3[] points = new Vector3[]
             {
                 transform.position
-                    - (m_TargetPosition - transform.position).normalized * 1.3f
-                    - (m_SelectedObject.transform.position - transform.position).normalized * 4.0f,
+                    - (m_TargetPosition - transform.position).normalized * 0.4f
+                    - Vector3.Dot(m_SelectedObject.transform.position - transform.position, transform.right) * transform.right * 2.0f,
                 transform.position,
-                Vector3.Lerp(transform.position, m_TargetPosition, .8f + (Mathf.Sin(Time.time * 2.0f) * .3f + .1f)),
-                (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * .5f) * .02f)),
+                Vector3.Lerp(transform.position, m_TargetPosition, .8f + (Mathf.Sin(Time.time * 2.0f) * .2f)),
+                (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * 2.5f) * .02f)),
                 m_SelectedObject.transform.position,
                 m_SelectedObject.transform.position
                     + (m_SelectedObject.transform.position - m_TargetPosition).normalized * 2.0f
