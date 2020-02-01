@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody m_Rigid;
     private Vector3 m_Rotation;
     private Vector3 m_CameraRotation;
-    private bool m_CursorIsLocked = false;
+    private bool m_CursorIsLocked = true;
     private bool m_LookLock = false;
 
     public CameraConstantShake CameraShake { get; set; }
@@ -83,6 +83,7 @@ public class PlayerController : MonoBehaviour
 
     private void InternalLockUpdate()
     {
+#if UNITY_EDITOR
         if (Input.GetKeyUp(KeyCode.Escape))
         {
             m_CursorIsLocked = false;
@@ -100,6 +101,7 @@ public class PlayerController : MonoBehaviour
         {
             UnlockCursor();
         }
+#endif
     }
 
     public void LockLook()

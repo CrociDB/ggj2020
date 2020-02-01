@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Collider))]
 public class Objective : MonoBehaviour
@@ -12,6 +13,9 @@ public class Objective : MonoBehaviour
     public float m_FloatAmount;
     public float m_FloatSpeed;
     public float m_RotateSpeed;
+
+    [Header("Game Flow")]
+    public string m_NextLevel;
 
     private PlayerController m_Player;
 
@@ -36,6 +40,12 @@ public class Objective : MonoBehaviour
             Debug.Log("YOU WON");
             GetComponent<Collider>().enabled = false;
             m_Player.CameraShake.FadeOut();
+            Invoke("NextLevel", .4f);
         }
+    }
+
+    private void NextLevel()
+    {
+        SceneManager.LoadScene(m_NextLevel);
     }
 }
