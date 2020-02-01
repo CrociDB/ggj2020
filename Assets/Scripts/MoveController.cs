@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Rendering.PostProcessing;
 
 public class MoveController : MonoBehaviour
 {
     [Header("References")]
     public Camera m_Camera;
+    public CameraConstantShake m_CameraShake;
     public Image m_AimImage;
     public LineRenderer m_LineRenderer;
+    public PostProcessProfile m_PostProfile;
 
     [Header("Tweak values")]
     public float m_RaycastDistance = 20.0f;
@@ -23,17 +26,26 @@ public class MoveController : MonoBehaviour
     private bool m_ScalingObject;
     private Vector3 m_TargetPosition;
 
-    private float m_MouseY;
+    private float m_ScaleAmount;
+
+    private ChromaticAberration m_EffectChromaticAberration;
+    private Vignette m_EffectVignette;
 
     public void Awake()
     {
         m_Player = GetComponent<PlayerController>();
+        m_ScaleAmount = 0.3f;
+
+        m_PostProfile.TryGetSettings(out m_EffectChromaticAberration);
+        m_PostProfile.TryGetSettings(out m_EffectVignette);
     }
 
     public void Update()
     {
         m_TargetPosition = transform.position + m_Camera.transform.forward * m_DistanceTargetMoving;
+
         UpdateLine();
+        UpdateCamera();
 
         // Move
         if (Input.GetMouseButtonDown(0))
@@ -62,6 +74,7 @@ public class MoveController : MonoBehaviour
                 m_SelectedObject.SelectObjectScale();
                 m_ScalingObject = true;
                 m_Player.LockLook();
+                m_ScaleAmount = Mathf.InverseLerp(m_SelectedObject.m_MinScale, m_SelectedObject.m_MaxScale, m_SelectedObject.m_CurrentScale);
             }
         }
        else if (Input.GetMouseButtonUp(1))
@@ -71,6 +84,7 @@ public class MoveController : MonoBehaviour
                 m_SelectedObject.UnselectObjectScale();
             }
 
+            m_ScaleAmount = 0.3f;
             m_Player.UnlockLook();
             m_ScalingObject = false;
         }
@@ -100,13 +114,26 @@ public class MoveController : MonoBehaviour
         }
     }
 
+    private void UpdateCamera()
+    {
+        m_Camera.fieldOfView = Mathf.Lerp(
+            m_Camera.fieldOfView,
+            Mathf.Lerp(40.0f, 120.0f, m_ScaleAmount),
+            10.0f * Time.deltaTime);
+
+        var normalized = Mathf.Clamp01((m_ScaleAmount - .3f) / .7f);
+
+        m_EffectChromaticAberration.intensity.value = normalized;
+        m_EffectVignette.intensity.value = Mathf.Clamp01(m_ScaleAmount) * .5f;
+        m_CameraShake.m_Amount = normalized * normalized;
+    }
+
     private void UpdateScaling()
     {
         var y = Input.GetAxisRaw("Mouse Y");
 
-        var scale = m_SelectedObject.m_CurrentScale;
-        scale -= y * .2f;
-        m_SelectedObject.UpdateTargetScale(scale);
+        m_ScaleAmount -= y * 0.1f;
+        m_SelectedObject.UpdateTargetScale(Mathf.Lerp(m_SelectedObject.m_MinScale, m_SelectedObject.m_MaxScale, m_ScaleAmount));
     }
 
     private void UpdateLine()

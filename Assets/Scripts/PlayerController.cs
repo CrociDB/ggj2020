@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     public float m_JumpForce = 2.0f;
     
     [Header("References")]
-    public Camera m_Camera;
+    public Transform m_CameraTransform;
 
     private Vector3 m_MoveHorizontal;
     private Vector3 m_MovVertical;
@@ -57,9 +57,9 @@ public class PlayerController : MonoBehaviour
                 m_Rigid.MoveRotation(m_Rigid.rotation * Quaternion.Euler(m_Rotation));
             }
 
-            if (m_Camera != null)
+            if (m_CameraTransform != null)
             {
-                m_Camera.transform.Rotate(-m_CameraRotation);
+                m_CameraTransform.transform.Rotate(-m_CameraRotation);
             }
 
             // Jump
