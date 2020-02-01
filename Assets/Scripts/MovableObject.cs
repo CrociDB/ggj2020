@@ -9,6 +9,7 @@ using UnityEngine;
 public class MovableObject : MonoBehaviour
 {
     public Material m_SelectedMaterial;
+    public Material m_DefaultMaterial;
 
     [Range(0.5f, 5.0f)]
     public float m_MinScale;
@@ -22,7 +23,6 @@ public class MovableObject : MonoBehaviour
     private MeshFilter m_MeshFilter;
     private Renderer m_Renderer;
 
-    private Material m_DefaultMaterial;
 
     private bool m_Moving;
     private bool m_Scaling;
@@ -30,13 +30,20 @@ public class MovableObject : MonoBehaviour
     private float m_MovingForce;
     private float m_DefaultMass;
 
-    private void Start()
+    public Rigidbody Rigidbody
+    {
+        get
+        {
+            return m_Rigidbody;
+        }
+    }
+
+    private void OnEnable()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
         m_MeshFilter = GetComponent<MeshFilter>();
         m_Renderer = GetComponent<Renderer>();
 
-        m_DefaultMaterial = m_Renderer.material;
         m_DefaultMass = m_Rigidbody.mass;
 
         m_TargetScale = m_CurrentScale;
@@ -61,6 +68,14 @@ public class MovableObject : MonoBehaviour
                 Mathf.Lerp(m_CurrentScale, m_TargetScale, 5.0f * Time.deltaTime),
                 m_MinScale,
                 m_MaxScale);
+
+        transform.localScale = Vector3.one * m_CurrentScale;
+        m_Rigidbody.mass = m_DefaultMass * m_CurrentScale;
+    }
+
+    public void ResetScale()
+    {
+        m_TargetScale = m_CurrentScale = 1.0f;
 
         transform.localScale = Vector3.one * m_CurrentScale;
         m_Rigidbody.mass = m_DefaultMass * m_CurrentScale;

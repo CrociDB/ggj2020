@@ -14,6 +14,9 @@ public class MoveController : MonoBehaviour
     public LineRenderer m_LineRenderer;
     public PostProcessProfile m_PostProfile;
 
+    [Header("Prefabs")]
+    public ParticleSystem m_DuplicateFX;
+
     [Header("Tweak values")]
     public float m_RaycastDistance = 20.0f;
     public float m_DistanceTargetMoving = 5.0f;
@@ -125,7 +128,7 @@ public class MoveController : MonoBehaviour
 
         m_EffectChromaticAberration.intensity.value = normalized;
         m_EffectVignette.intensity.value = Mathf.Clamp01(m_ScaleAmount) * .5f;
-        m_CameraShake.m_Amount = normalized * normalized;
+        m_CameraShake.m_Amount = normalized;
     }
 
     private void UpdateScaling()
@@ -134,6 +137,43 @@ public class MoveController : MonoBehaviour
 
         m_ScaleAmount -= y * 0.1f;
         m_SelectedObject.UpdateTargetScale(Mathf.Lerp(m_SelectedObject.m_MinScale, m_SelectedObject.m_MaxScale, m_ScaleAmount));
+
+        if (m_ScaleAmount >= 1.0f)
+        {
+            DuplicateObject();
+
+            if (m_SelectedObject != null)
+            {
+                m_SelectedObject.UnselectObjectScale();
+            }
+
+            m_ScaleAmount = 0.3f;
+            m_Player.UnlockLook();
+            m_ScalingObject = false;
+
+            m_SelectedObject = null;
+        }
+    }
+
+    private void DuplicateObject()
+    {
+        var fx = Instantiate(m_DuplicateFX);
+        fx.transform.position = m_SelectedObject.transform.position;
+
+        m_SelectedObject.ResetScale();
+
+        var copy = Instantiate(m_SelectedObject);
+        copy.ResetScale();
+        m_SelectedObject.transform.position -= transform.right;
+        copy.transform.position += transform.right;
+
+        m_SelectedObject.UnselectObjectScale();
+        copy.UnselectObjectScale();
+
+        m_SelectedObject.Rigidbody.AddForce(transform.right * -2.0f + Vector3.up * 3.0f, ForceMode.Impulse);
+        copy.Rigidbody.AddForce(transform.right * 2.0f + Vector3.up * 3.0f, ForceMode.Impulse);
+
+        m_CameraShake.ShakeFor(0.3f);
     }
 
     private void UpdateLine()
