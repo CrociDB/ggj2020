@@ -16,36 +16,72 @@ public class MoveController : MonoBehaviour
     public float m_DistanceTargetMoving = 5.0f;
     public float m_MovingForce;
 
+    private PlayerController m_Player;
+
     private MovableObject m_SelectedObject;
     private bool m_MovingObject;
+    private bool m_ScalingObject;
     private Vector3 m_TargetPosition;
+
+    private float m_MouseY;
+
+    public void Awake()
+    {
+        m_Player = GetComponent<PlayerController>();
+    }
 
     public void Update()
     {
         m_TargetPosition = transform.position + m_Camera.transform.forward * m_DistanceTargetMoving;
         UpdateLine();
 
+        // Move
         if (Input.GetMouseButtonDown(0))
         {
             if (m_SelectedObject != null)
             {
-                m_SelectedObject.SelectObject();
+                m_SelectedObject.SelectObjectMove();
                 m_MovingObject = true;
             }
         }
-        if (Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(0))
         {
             if (m_SelectedObject != null)
             {
-                m_SelectedObject.UnselectObject();
+                m_SelectedObject.UnselectObjectMove();
             }
 
             m_MovingObject = false;
         }
 
+        // Scale
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (m_SelectedObject != null)
+            {
+                m_SelectedObject.SelectObjectScale();
+                m_ScalingObject = true;
+                m_Player.LockLook();
+            }
+        }
+       else if (Input.GetMouseButtonUp(1))
+        {
+            if (m_SelectedObject != null)
+            {
+                m_SelectedObject.UnselectObjectScale();
+            }
+
+            m_Player.UnlockLook();
+            m_ScalingObject = false;
+        }
+
         if (m_MovingObject)
         {
             m_SelectedObject.UpdateTargetPosition(m_TargetPosition, m_MovingForce);
+        }
+        else if (m_ScalingObject)
+        {
+            UpdateScaling();
         }
         else
         {
@@ -62,6 +98,15 @@ public class MoveController : MonoBehaviour
                 m_SelectedObject = null;
             }
         }
+    }
+
+    private void UpdateScaling()
+    {
+        var y = Input.GetAxisRaw("Mouse Y");
+
+        var scale = m_SelectedObject.m_CurrentScale;
+        scale -= y * .2f;
+        m_SelectedObject.UpdateTargetScale(scale);
     }
 
     private void UpdateLine()

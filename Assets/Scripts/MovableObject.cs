@@ -10,6 +10,14 @@ public class MovableObject : MonoBehaviour
 {
     public Material m_SelectedMaterial;
 
+    [Range(0.5f, 5.0f)]
+    public float m_MinScale;
+    [Range(0.5f, 5.0f)]
+    public float m_MaxScale;
+
+    public float m_CurrentScale;
+    private float m_TargetScale;
+
     private Rigidbody m_Rigidbody;
     private MeshFilter m_MeshFilter;
     private Renderer m_Renderer;
@@ -17,8 +25,10 @@ public class MovableObject : MonoBehaviour
     private Material m_DefaultMaterial;
 
     private bool m_Moving;
+    private bool m_Scaling;
     private Vector3 m_TargetPosition;
     private float m_MovingForce;
+    private float m_DefaultMass;
 
     private void Start()
     {
@@ -27,6 +37,9 @@ public class MovableObject : MonoBehaviour
         m_Renderer = GetComponent<Renderer>();
 
         m_DefaultMaterial = m_Renderer.material;
+        m_DefaultMass = m_Rigidbody.mass;
+
+        m_TargetScale = m_CurrentScale;
     }
 
     public void Update()
@@ -35,6 +48,22 @@ public class MovableObject : MonoBehaviour
         {
             UpdatePosition();
         }
+
+        if (m_Scaling)
+        {
+            UpdateScale();
+        }
+    }
+
+    private void UpdateScale()
+    {
+        m_CurrentScale = Mathf.Clamp(
+                Mathf.Lerp(m_CurrentScale, m_TargetScale, 5.0f * Time.deltaTime),
+                m_MinScale,
+                m_MaxScale);
+
+        transform.localScale = Vector3.one * m_CurrentScale;
+        m_Rigidbody.mass = m_DefaultMass * m_CurrentScale;
     }
 
     private void UpdatePosition()
@@ -43,23 +72,44 @@ public class MovableObject : MonoBehaviour
         m_Rigidbody.AddForce(dir * m_MovingForce);
     }
 
-    public void SelectObject()
+
+    public void SelectObjectScale()
+    {
+        m_Renderer.material = m_SelectedMaterial;
+        m_Rigidbody.useGravity = false;
+        m_Scaling = true;
+    }
+
+    public void UnselectObjectScale()
+    {
+        m_Renderer.material = m_DefaultMaterial;
+        m_Rigidbody.useGravity = true;
+        m_Scaling = false;
+    }
+
+    public void SelectObjectMove()
     {
         m_Renderer.material = m_SelectedMaterial;
         m_Rigidbody.useGravity = false;
         m_Moving = true;
     }
 
-    public void UnselectObject()
+    public void UnselectObjectMove()
     {
         m_Renderer.material = m_DefaultMaterial;
         m_Rigidbody.useGravity = true;
         m_Moving = false;
     }
 
+
     public void UpdateTargetPosition(Vector3 targetPosition, float force)
     {
         m_TargetPosition = targetPosition;
         m_MovingForce = force;
+    }
+
+    public void UpdateTargetScale(float scale)
+    {
+        m_TargetScale = scale;
     }
 }

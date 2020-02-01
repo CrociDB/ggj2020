@@ -789,6 +789,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SelectedMaterial: {fileID: 2100000, guid: 4b7a3350ec91ba540bbbe6599bbe51b8, type: 2}
+  m_MinScale: 0.5
+  m_MaxScale: 5
+  m_CurrentScale: 1
 --- !u!43 &239998031
 Mesh:
   m_ObjectHideFlags: 0
@@ -987,6 +990,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SelectedMaterial: {fileID: 2100000, guid: 4b7a3350ec91ba540bbbe6599bbe51b8, type: 2}
+  m_MinScale: 0.5
+  m_MaxScale: 5
+  m_CurrentScale: 1
 --- !u!54 &245656490
 Rigidbody:
   m_ObjectHideFlags: 0

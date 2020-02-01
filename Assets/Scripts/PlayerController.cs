@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_Rotation;
     private Vector3 m_CameraRotation;
     private bool m_CursorIsLocked = false;
+    private bool m_LookLock = false;
 
     private void Start()
     {
@@ -38,7 +39,7 @@ public class PlayerController : MonoBehaviour
 
         m_Velocity = (m_MoveHorizontal + m_MovVertical) * m_Speed;
 
-        if (m_CursorIsLocked)
+        if (m_CursorIsLocked && !m_LookLock)
         {
             var rot = Input.GetAxisRaw("Mouse X");
             m_Rotation = Vector3.Lerp(m_Rotation, new Vector3(0, rot, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
@@ -96,6 +97,16 @@ public class PlayerController : MonoBehaviour
         {
             UnlockCursor();
         }
+    }
+
+    public void LockLook()
+    {
+        m_LookLock = true;
+    }
+
+    public void UnlockLook()
+    {
+        m_LookLock = false;
     }
 
     private void LockCursor()
