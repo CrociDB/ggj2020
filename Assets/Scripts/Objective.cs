@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -37,11 +38,15 @@ public class Objective : MonoBehaviour
         PlayerController p;
         if (other.gameObject.TryGetComponent<PlayerController>(out p) && p == m_Player)
         {
-            Debug.Log("YOU WON");
-            GetComponent<Collider>().enabled = false;
-            m_Player.CameraShake.FadeOut();
-            Invoke("NextLevel", .4f);
+            Win();
         }
+    }
+
+    public void Win()
+    {
+        GetComponent<Collider>().enabled = false;
+        m_Player.CameraShake.FadeOut();
+        Invoke("NextLevel", .4f);
     }
 
     private void NextLevel()
