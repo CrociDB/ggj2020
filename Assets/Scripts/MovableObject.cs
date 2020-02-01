@@ -65,7 +65,7 @@ public class MovableObject : MonoBehaviour
     private void UpdateScale()
     {
         m_CurrentScale = Mathf.Clamp(
-                Mathf.Lerp(m_CurrentScale, m_TargetScale, 5.0f * Time.deltaTime),
+                Mathf.Lerp(m_CurrentScale, m_TargetScale, 8.0f * Time.deltaTime),
                 m_MinScale,
                 m_MaxScale);
 

@@ -127,15 +127,15 @@ public class MoveController : MonoBehaviour
         var normalized = Mathf.Clamp01((m_ScaleAmount - .3f) / .7f);
 
         m_EffectChromaticAberration.intensity.value = normalized;
-        m_EffectVignette.intensity.value = Mathf.Clamp01(m_ScaleAmount) * .5f;
-        m_CameraShake.m_Amount = normalized;
+        m_EffectVignette.intensity.value = Mathf.Clamp01(m_ScaleAmount) * .4f;
+        m_CameraShake.m_Amount = m_ScalingObject ? Mathf.Clamp01((m_ScaleAmount - .1f) / .9f) : 0.0f;
     }
 
     private void UpdateScaling()
     {
         var y = Input.GetAxisRaw("Mouse Y");
 
-        m_ScaleAmount -= y * 0.1f;
+        m_ScaleAmount -= y * 0.04f;
         m_SelectedObject.UpdateTargetScale(Mathf.Lerp(m_SelectedObject.m_MinScale, m_SelectedObject.m_MaxScale, m_ScaleAmount));
 
         if (m_ScaleAmount >= 1.0f)

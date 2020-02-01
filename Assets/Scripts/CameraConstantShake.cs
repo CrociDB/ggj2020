@@ -26,7 +26,7 @@ public class CameraConstantShake : MonoBehaviour
     private void Awake()
     {
         m_Camera = GetComponentInChildren<Camera>();
-        m_Camera.gameObject.GetComponent<PostProcessVolume>().profile.TryGetSettings<ColorGrading>(out m_EffectColorGrading);
+        m_Camera.gameObject.GetComponent<PostProcessVolume>().sharedProfile.TryGetSettings<ColorGrading>(out m_EffectColorGrading);
         FadeIn();
     }
 
