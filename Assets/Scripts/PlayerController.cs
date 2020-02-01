@@ -1,107 +1,110 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
-    private float speed = 3.0f;
-    private float m_MovX;
-    private float m_MovY;
-    private Vector3 m_moveHorizontal;
-    private Vector3 m_movVertical;
-    private Vector3 m_velocity;
-    private Rigidbody m_Rigid;
-    private float m_yRot;
-    private float m_xRot;
-    private Vector3 m_rotation;
-    private Vector3 m_cameraRotation;
-    private float m_lookSensitivity = 3.0f;
-    private bool m_cursorIsLocked = false;
-
-    [Header("The Camera the player looks through")]
+    [Header("Tweak Values")]
+    public float m_Speed = 3.0f;
+    public float m_LookSensitivity = 3.0f;
+    public float m_LookSmoothRate = 15.0f;
+    public float m_JumpForce = 2.0f;
+    
+    [Header("References")]
     public Camera m_Camera;
 
-    // Use this for initialization
+    private Vector3 m_MoveHorizontal;
+    private Vector3 m_MovVertical;
+    private Vector3 m_Velocity;
+    private Rigidbody m_Rigid;
+    private Vector3 m_Rotation;
+    private Vector3 m_CameraRotation;
+    private bool m_CursorIsLocked = false;
+
     private void Start()
     {
         m_Rigid = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
     public void Update()
     {
-        m_MovX = Input.GetAxis("Horizontal");
-        m_MovY = Input.GetAxis("Vertical");
+        var movX = Input.GetAxis("Horizontal");
+        var movY = Input.GetAxis("Vertical");
 
-        m_moveHorizontal = transform.right * m_MovX;
-        m_movVertical = transform.forward * m_MovY;
+        m_MoveHorizontal = transform.right * movX;
+        m_MovVertical = transform.forward * movY;
 
-        m_velocity = (m_moveHorizontal + m_movVertical) * speed;
+        m_Velocity = (m_MoveHorizontal + m_MovVertical) * m_Speed;
 
-        //mouse movement 
-        if (m_cursorIsLocked)
+        if (m_CursorIsLocked)
         {
-            m_yRot = Input.GetAxisRaw("Mouse X");
-            m_rotation = new Vector3(0, m_yRot, 0) * m_lookSensitivity;
+            var rot = Input.GetAxisRaw("Mouse X");
+            m_Rotation = Vector3.Lerp(m_Rotation, new Vector3(0, rot, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
 
-            m_xRot = Input.GetAxisRaw("Mouse Y");
-            m_cameraRotation = new Vector3(m_xRot, 0, 0) * m_lookSensitivity;
+            rot = Input.GetAxisRaw("Mouse Y");
+            m_CameraRotation = Vector3.Lerp(m_CameraRotation, new Vector3(rot, 0, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
 
-            //apply camera rotation
-
-            //move the actual player here
-            if (m_velocity != Vector3.zero)
+            if (m_Velocity != Vector3.zero)
             {
-                m_Rigid.MovePosition(m_Rigid.position + m_velocity * Time.fixedDeltaTime);
+                m_Rigid.MovePosition(m_Rigid.position + m_Velocity * Time.fixedDeltaTime);
             }
 
-            if (m_rotation != Vector3.zero)
+            if (m_Rotation != Vector3.zero)
             {
-                //rotate the camera of the player
-                m_Rigid.MoveRotation(m_Rigid.rotation * Quaternion.Euler(m_rotation));
+                m_Rigid.MoveRotation(m_Rigid.rotation * Quaternion.Euler(m_Rotation));
             }
 
             if (m_Camera != null)
             {
-                //negate this value so it rotates like a FPS not like a plane
-                m_Camera.transform.Rotate(-m_cameraRotation);
+                m_Camera.transform.Rotate(-m_CameraRotation);
+            }
+
+            // Jump
+            if (Input.GetKeyDown(KeyCode.Space) && NotFalling())
+            {
+                m_Rigid.AddForce(Vector3.up * m_JumpForce, ForceMode.Impulse);
             }
         }
 
         InternalLockUpdate();
-
     }
 
-    //controls the locking and unlocking of the mouse
+    private bool NotFalling()
+    {
+        Ray r = new Ray(transform.position, -Vector3.up);
+        return Physics.Raycast(r, 1.2f, ~(1 << 8));
+    }
+
     private void InternalLockUpdate()
     {
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            m_cursorIsLocked = false;
+            m_CursorIsLocked = false;
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            m_cursorIsLocked = true;
+            m_CursorIsLocked = true;
         }
 
-        if (m_cursorIsLocked)
-        {
-            UnlockCursor();
-        }
-        else if (!m_cursorIsLocked)
+        if (m_CursorIsLocked)
         {
             LockCursor();
         }
+        else if (!m_CursorIsLocked)
+        {
+            UnlockCursor();
+        }
     }
 
-    private void UnlockCursor()
+    private void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    private void LockCursor()
+    private void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
