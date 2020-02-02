@@ -869,6 +869,7 @@ MonoBehaviour:
   m_DefaultMaterial: {fileID: 2100000, guid: 8bcffd0377579554a87bb61aa9c3e8dc, type: 2}
   m_MinScale: 0.5
   m_MaxScale: 5
+  m_Single: 0
   m_CurrentScale: 1
 --- !u!1 &261325496
 GameObject:
@@ -3968,6 +3969,7 @@ MonoBehaviour:
   m_DefaultMaterial: {fileID: 2100000, guid: 8bcffd0377579554a87bb61aa9c3e8dc, type: 2}
   m_MinScale: 0.5
   m_MaxScale: 5
+  m_Single: 0
   m_CurrentScale: 1
 --- !u!54 &1478223636
 Rigidbody:
@@ -4521,7 +4523,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-407108
+  m_Name: pb_Mesh-1282122
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5027,7 +5029,7 @@ PrefabInstance:
     - target: {fileID: 6360182881385915333, guid: f1fcb4e73ce6ab6449c8513d46d71a41,
         type: 3}
       propertyPath: m_NextLevel
-      value: Level1
+      value: Level3
       objectReference: {fileID: 0}
     - target: {fileID: 6360182881385915335, guid: f1fcb4e73ce6ab6449c8513d46d71a41,
         type: 3}
