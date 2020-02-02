@@ -119,16 +119,37 @@ public class MoveController : MonoBehaviour
 
     private void UpdateCamera()
     {
+        m_CameraShake.m_Amount = 0.0f;
+
+        if (m_ScalingObject)
+        {
+            m_Camera.fieldOfView = Mathf.Lerp(
+                m_Camera.fieldOfView,
+                Mathf.Lerp(40.0f, 120.0f, m_ScaleAmount),
+                10.0f * Time.deltaTime);
+            
+            m_CameraShake.m_Amount = Mathf.Clamp01((m_ScaleAmount - .1f) / .9f);
+
+        }
+        else if (m_MovingObject)
+        {
+            m_Camera.fieldOfView = Mathf.Lerp(
+                m_Camera.fieldOfView,
+                92.0f,
+                10.0f * Time.deltaTime);
+        
+            m_CameraShake.m_Amount = 0.04f;
+        }
+
         m_Camera.fieldOfView = Mathf.Lerp(
-            m_Camera.fieldOfView,
-            Mathf.Lerp(40.0f, 120.0f, m_ScaleAmount),
-            10.0f * Time.deltaTime);
+                m_Camera.fieldOfView,
+                60.0f,
+                10.0f * Time.deltaTime);
 
         var normalized = Mathf.Clamp01((m_ScaleAmount - .3f) / .7f);
 
         m_EffectChromaticAberration.intensity.value = normalized;
-        m_EffectVignette.intensity.value = Mathf.Clamp01(m_ScaleAmount) * .4f;
-        m_CameraShake.m_Amount = m_ScalingObject ? Mathf.Clamp01((m_ScaleAmount - .1f) / .9f) : 0.0f;
+        m_EffectVignette.intensity.value = Mathf.Clamp01(m_ScaleAmount) * .5f;
     }
 
     private void UpdateScaling()

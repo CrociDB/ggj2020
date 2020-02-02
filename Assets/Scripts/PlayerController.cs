@@ -64,7 +64,7 @@ public class PlayerController : MonoBehaviour
 
             if (dotUp < .99f)
             {
-                m_LastCameraRotation = m_CameraTransform.rotation;
+                m_LastCameraRotation = m_CameraTransform.localRotation;
                 m_CameraRotation = Vector3.Lerp(m_CameraRotation, new Vector3(rot, 0, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
                 if (m_CameraTransform != null)
                 {
@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                m_CameraTransform.rotation = m_LastCameraRotation;
+                m_CameraTransform.localRotation = m_LastCameraRotation;
             }
 
             // Jump
@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
 
     private void InternalLockUpdate()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_WEBGL
         if (Input.GetKeyUp(KeyCode.Escape))
         {
             m_CursorIsLocked = false;

@@ -215,8 +215,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Speed: 3
-  m_LookSensitivity: 2.5
-  m_LookSmoothRate: 16
+  m_LookSensitivity: 1.3
+  m_LookSmoothRate: 20
   m_JumpForce: 15
   m_CameraTransform: {fileID: 3196589429550991504}
 --- !u!114 &3196589428741054415
@@ -329,7 +329,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.35
+  m_Radius: 0.45
   m_Center: {x: 0, y: -0.62, z: 0}
 --- !u!1 &3196589429129045580
 GameObject:
