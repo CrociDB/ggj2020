@@ -11,10 +11,12 @@ public class MovableObject : MonoBehaviour
     public Material m_SelectedMaterial;
     public Material m_DefaultMaterial;
 
-    [Range(0.5f, 5.0f)]
+    [Range(0.1f, 5.0f)]
     public float m_MinScale;
-    [Range(0.5f, 5.0f)]
+    [Range(0.1f, 5.0f)]
     public float m_MaxScale;
+
+    public bool m_Single = false;
 
     public float m_CurrentScale;
     private float m_TargetScale;

@@ -138,7 +138,7 @@ public class MoveController : MonoBehaviour
         m_ScaleAmount -= y * 0.04f;
         m_SelectedObject.UpdateTargetScale(Mathf.Lerp(m_SelectedObject.m_MinScale, m_SelectedObject.m_MaxScale, m_ScaleAmount));
 
-        if (m_ScaleAmount >= 1.0f)
+        if (m_ScaleAmount >= 1.0f && !m_SelectedObject.m_Single)
         {
             DuplicateObject();
 
