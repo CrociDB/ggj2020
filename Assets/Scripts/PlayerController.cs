@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_CameraRotation;
     private bool m_CursorIsLocked = true;
     private bool m_LookLock = false;
+    private Quaternion m_LastCameraRotation;
 
     public CameraConstantShake CameraShake { get; set; }
 
@@ -48,7 +49,6 @@ public class PlayerController : MonoBehaviour
             m_Rotation = Vector3.Lerp(m_Rotation, new Vector3(0, rot, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
 
             rot = Input.GetAxisRaw("Mouse Y");
-            m_CameraRotation = Vector3.Lerp(m_CameraRotation, new Vector3(rot, 0, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
 
             if (m_Velocity != Vector3.zero)
             {
@@ -60,9 +60,20 @@ public class PlayerController : MonoBehaviour
                 m_Rigid.MoveRotation(m_Rigid.rotation * Quaternion.Euler(m_Rotation));
             }
 
-            if (m_CameraTransform != null)
+            var dotUp = Mathf.Abs(Vector3.Dot(m_CameraTransform.forward, Vector3.up));
+
+            if (dotUp < .99f)
             {
-                m_CameraTransform.transform.Rotate(-m_CameraRotation);
+                m_LastCameraRotation = m_CameraTransform.rotation;
+                m_CameraRotation = Vector3.Lerp(m_CameraRotation, new Vector3(rot, 0, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
+                if (m_CameraTransform != null)
+                {
+                    m_CameraTransform.transform.Rotate(-m_CameraRotation);
+                }
+            }
+            else
+            {
+                m_CameraTransform.rotation = m_LastCameraRotation;
             }
 
             // Jump
@@ -71,6 +82,7 @@ public class PlayerController : MonoBehaviour
                 m_Rigid.AddForce(Vector3.up * m_JumpForce, ForceMode.Impulse);
             }
         }
+
 
         InternalLockUpdate();
     }
