@@ -72,7 +72,7 @@ public class MovableObject : MonoBehaviour
                 m_MaxScale);
 
         transform.localScale = Vector3.one * m_CurrentScale;
-        m_Rigidbody.mass = m_DefaultMass * m_CurrentScale;
+        m_Rigidbody.mass = m_DefaultMass * m_CurrentScale * m_CurrentScale;
     }
 
     public void ResetScale()
@@ -80,13 +80,15 @@ public class MovableObject : MonoBehaviour
         m_TargetScale = m_CurrentScale = 1.0f;
 
         transform.localScale = Vector3.one * m_CurrentScale;
-        m_Rigidbody.mass = m_DefaultMass * m_CurrentScale;
+        m_Rigidbody.mass = m_DefaultMass * m_CurrentScale * m_CurrentScale;
     }
 
     private void UpdatePosition()
     {
-        var dir = m_TargetPosition - transform.position;
+        var dir = (m_TargetPosition - transform.position);
         m_Rigidbody.AddForce(dir * m_MovingForce);
+        m_Rigidbody.velocity *= .992f;
+        m_Rigidbody.angularVelocity *= .998f;
     }
 
 
