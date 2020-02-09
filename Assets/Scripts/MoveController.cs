@@ -43,12 +43,16 @@ public class MoveController : MonoBehaviour
         m_PostProfile.TryGetSettings(out m_EffectVignette);
     }
 
+    private void FixedUpdate()
+    {
+        UpdateCamera();
+    }
+
     public void Update()
     {
         m_TargetPosition = transform.position + m_Camera.transform.forward * m_DistanceTargetMoving;
 
         UpdateLine();
-        UpdateCamera();
 
         // Move
         if (Input.GetMouseButtonDown(0))
@@ -126,25 +130,25 @@ public class MoveController : MonoBehaviour
             m_Camera.fieldOfView = Mathf.Lerp(
                 m_Camera.fieldOfView,
                 Mathf.Lerp(40.0f, 120.0f, m_ScaleAmount),
-                10.0f * Time.deltaTime);
+                12.0f * Time.deltaTime);
             
             m_CameraShake.m_Amount = Mathf.Clamp01((m_ScaleAmount - .1f) / .9f);
-
         }
         else if (m_MovingObject)
         {
             m_Camera.fieldOfView = Mathf.Lerp(
                 m_Camera.fieldOfView,
-                92.0f,
-                10.0f * Time.deltaTime);
-        
-            m_CameraShake.m_Amount = 0.04f;
+                75.0f,
+                8.0f * Time.deltaTime);
+        }
+        else
+        {
+            m_Camera.fieldOfView = Mathf.Lerp(
+                    m_Camera.fieldOfView,
+                    60.0f,
+                    10.0f * Time.deltaTime);
         }
 
-        m_Camera.fieldOfView = Mathf.Lerp(
-                m_Camera.fieldOfView,
-                60.0f,
-                10.0f * Time.deltaTime);
 
         var normalized = Mathf.Clamp01((m_ScaleAmount - .3f) / .7f);
 
@@ -211,8 +215,8 @@ public class MoveController : MonoBehaviour
                     - (m_TargetPosition - transform.position).normalized * 0.4f
                     - Vector3.Dot(m_SelectedObject.transform.position - transform.position, transform.right) * transform.right * 2.0f,
                 transform.position,
-                Vector3.Lerp(transform.position, m_TargetPosition, .8f + (Mathf.Sin(Time.time * 2.0f) * .2f)),
-                (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * 2.5f) * .02f)),
+                Vector3.Lerp(transform.position, m_TargetPosition, .45f + (Mathf.Sin(Time.time * 2.0f) * .05f)),
+                Vector3.Lerp(transform.position, (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * 2.5f) * .01f)), .65f),
                 m_SelectedObject.transform.position,
                 m_SelectedObject.transform.position
                     + (m_SelectedObject.transform.position - m_TargetPosition).normalized * 2.0f
@@ -251,11 +255,11 @@ public class MoveController : MonoBehaviour
             Vector3[] points = new Vector3[]
             {
                 transform.position
-                    - (m_TargetPosition - transform.position).normalized * 1.3f
-                    - (m_SelectedObject.transform.position - transform.position).normalized * 4.0f,
+                    - (m_TargetPosition - transform.position).normalized * 0.4f
+                    - Vector3.Dot(m_SelectedObject.transform.position - transform.position, transform.right) * transform.right * 2.0f,
                 transform.position,
-                Vector3.Lerp(transform.position, m_TargetPosition, .8f + (Mathf.Sin(Time.time * 2.0f) * .3f + .1f)),
-                (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * .5f) * .02f)),
+                Vector3.Lerp(transform.position, m_TargetPosition, .45f + (Mathf.Sin(Time.time * 2.0f) * .05f)),
+                Vector3.Lerp(transform.position, (m_TargetPosition + m_SelectedObject.transform.position) * (.5f + (Mathf.Sin(Time.time * 2.5f) * .01f)), .65f),
                 m_SelectedObject.transform.position,
                 m_SelectedObject.transform.position
                     + (m_SelectedObject.transform.position - m_TargetPosition).normalized * 2.0f
