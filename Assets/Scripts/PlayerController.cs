@@ -20,10 +20,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_Velocity;
     private Rigidbody m_Rigid;
     private Vector3 m_Rotation;
-    private Vector3 m_CameraRotation;
+    private float m_CameraRotation;
     private bool m_CursorIsLocked = true;
     private bool m_LookLock = false;
-    private Quaternion m_LastCameraRotation;
 
     public CameraConstantShake CameraShake { get; set; }
 
@@ -45,10 +44,9 @@ public class PlayerController : MonoBehaviour
 
         if (m_CursorIsLocked && !m_LookLock)
         {
-            var rot = Input.GetAxisRaw("Mouse X");
+            var rot = Input.GetAxis("Mouse X");
             m_Rotation = Vector3.Lerp(m_Rotation, new Vector3(0, rot, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
-
-            rot = Input.GetAxisRaw("Mouse Y");
+            rot = Input.GetAxis("Mouse Y");
 
             if (m_Velocity != Vector3.zero)
             {
@@ -60,20 +58,20 @@ public class PlayerController : MonoBehaviour
                 m_Rigid.MoveRotation(m_Rigid.rotation * Quaternion.Euler(m_Rotation));
             }
 
-            var dotUp = Mathf.Abs(Vector3.Dot(m_CameraTransform.forward, Vector3.up));
+            var dotUp = (Vector3.Dot(m_CameraTransform.forward, Vector3.up));
+            var dotDown = (Vector3.Dot(m_CameraTransform.forward, -Vector3.up));
 
-            if (dotUp < .99f)
+            var du = Mathf.Pow(Mathf.Clamp01((1.0f - dotUp) * 8.0f - .2f), 0.2f);
+            var dd = Mathf.Pow(Mathf.Clamp01((1.0f - dotDown) * 8.0f - .05f), 0.1f);
+
+            m_CameraRotation = Mathf.Lerp(m_CameraRotation, rot * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
+
+            if (m_CameraRotation >= 0.0f) m_CameraRotation *= du;
+            else m_CameraRotation *= dd;
+
+            if (m_CameraTransform != null)
             {
-                m_LastCameraRotation = m_CameraTransform.localRotation;
-                m_CameraRotation = Vector3.Lerp(m_CameraRotation, new Vector3(rot, 0, 0) * m_LookSensitivity, m_LookSmoothRate * Time.deltaTime);
-                if (m_CameraTransform != null)
-                {
-                    m_CameraTransform.transform.Rotate(-m_CameraRotation);
-                }
-            }
-            else
-            {
-                m_CameraTransform.localRotation = m_LastCameraRotation;
+                m_CameraTransform.Rotate(-Vector3.right * m_CameraRotation);
             }
 
             // Jump
